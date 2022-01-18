@@ -2,6 +2,7 @@ package com;
 
 import com.model.Tokens;
 import com.model.UserRegisterResponse;
+import io.qameta.allure.Step;
 import org.apache.commons.lang3.RandomStringUtils;
 
 import java.util.HashMap;
@@ -18,6 +19,7 @@ public class UserOperations {
      возвращает мапу с данными: имя, пароль, имэйл
      если регистрация не удалась, возвращает пустую мапу
      */
+    @Step("Регистрация нового пользователя.")
     public Map<String, String> register() {
 
         // с помощью библиотеки RandomStringUtils генерируем имэйл
@@ -64,6 +66,7 @@ public class UserOperations {
      метод удаления пользователя по токену, возвращенному после создания
      пользователя. Удаляем только в случае, если token заполнен.
      */
+    @Step("Удаление пользователя.")
     public void delete() {
         if (Tokens.getAccessToken() == null) {
             return;
@@ -75,6 +78,50 @@ public class UserOperations {
                 .delete("auth/user")
                 .then()
                 .statusCode(202);
+    }
+
+    //Добавил далее методы для получения рандомных данных и немного измененный метод register для задания токенов
+    //для проверки регистрацию не через апи, а именно через ui. И чтобы по этим данным можно было потом удалить пользователя
+    @Step("Генерация почты.")
+    public String getRandomEmail () {
+        return RandomStringUtils.randomAlphabetic(10) + EMAIL_POSTFIX;
+    }
+
+    @Step("Генерация пароля длиной 5 символов.")
+    public String getRandomIncorrectPassword () {
+        return RandomStringUtils.randomAlphabetic(5);
+    }
+
+    @Step("Генерация пароля.")
+    public String getRandomPassword () {
+        return RandomStringUtils.randomAlphabetic(10);
+    }
+
+    @Step("Генерация имени.")
+    public String getRandomName () {
+        return RandomStringUtils.randomAlphabetic(10);
+    }
+
+    @Step("Получить и задать токены для пользователя.")
+    public void setTokens(String email, String password) {
+
+        Map<String, String> inputDataMap = new HashMap<>();
+        inputDataMap.put("email", email);
+        inputDataMap.put("password", password);
+
+        UserRegisterResponse response = given()
+                .spec(Base.getBaseSpec())
+                .and()
+                .body(inputDataMap)
+                .when()
+                .post("auth/login")
+                .body()
+                .as(UserRegisterResponse.class);
+
+        if (response != null) {
+            Tokens.setAccessToken(response.getAccessToken().substring(7));
+            Tokens.setRefreshToken(response.getRefreshToken());
+        }
     }
 
 }
