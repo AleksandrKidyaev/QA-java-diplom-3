@@ -20,19 +20,33 @@ public class AuthorizationTest {
     private UserOperations userOperations;
     private MainPage mainPage;
     private AuthorizationPage authorizationPage;
+    private String email;
+    private String password;
 
     @Before
     public void setUp () {
+
         userOperations = new UserOperations();
+
         ChromeOptions options = new ChromeOptions();
         options.setBinary("C:\\Users\\karlw\\AppData\\Local\\Yandex\\YandexBrowser\\Application\\browser.exe");
         WebDriverRunner.setWebDriver(new ChromeDriver(options));
+
+        Map<String, String> newUser = userOperations.register();
+
+        email = newUser.get("email");
+        password = newUser.get("password");
+        mainPage = open(URL, MainPage.class);
+
     }
 
     @After
     public void tearDown () {
+
         userOperations.delete();
+
         getWebDriver().quit();
+
     }
 
     @Epic(value = "UI Stellar Burgers")
@@ -43,14 +57,14 @@ public class AuthorizationTest {
     @Owner(value = "Кидяев Александр Дмитриевич")
     @Severity(value = SeverityLevel.CRITICAL)
     public void authorizationByMainPageEnterButtonTest() {
-        Map<String, String> newUser = userOperations.register();
-        String email = newUser.get("email");
-        String password = newUser.get("password");
-        mainPage = open(URL, MainPage.class);
+
         mainPage.clickEnterAccountButton();
+
         authorizationPage = page(AuthorizationPage.class);
+
         authorizationPage.inputAuthorizationData(email, password);
         authorizationPage.clickEnterButton();
+
         mainPage.isOnMainPageAndAuthorized();
         String actualURL = url();
         Assert.assertEquals(URL, actualURL);
@@ -65,15 +79,16 @@ public class AuthorizationTest {
     @Owner(value = "Кидяев Александр Дмитриевич")
     @Severity(value = SeverityLevel.CRITICAL)
     public void authorizationByProfileButtonOnMainPageTest() {
-        Map<String, String> newUser = userOperations.register();
-        String email = newUser.get("email");
-        String password = newUser.get("password");
-        mainPage = open(URL, MainPage.class);
+
         mainPage.clickProfileLink();
+
         authorizationPage = page(AuthorizationPage.class);
+
         authorizationPage.inputAuthorizationData(email, password);
         authorizationPage.clickEnterButton();
+
         mainPage.isOnMainPageAndAuthorized();
+
     }
 
     @Epic(value = "UI Stellar Burgers")
@@ -84,18 +99,21 @@ public class AuthorizationTest {
     @Owner(value = "Кидяев Александр Дмитриевич")
     @Severity(value = SeverityLevel.CRITICAL)
     public void authorizationByLinkFromRegistrationPageTest() {
-        Map<String, String> newUser = userOperations.register();
-        String email = newUser.get("email");
-        String password = newUser.get("password");
-        mainPage = open(URL, MainPage.class);
+
         mainPage.clickEnterAccountButton();
+
         authorizationPage = page(AuthorizationPage.class);
+
         authorizationPage.clickRegisterLink();
+
         RegistrationPage registrationPage = page(RegistrationPage.class);
+
         registrationPage.clickEnterLink();
         authorizationPage.inputAuthorizationData(email, password);
         authorizationPage.clickEnterButton();
+
         mainPage.isOnMainPageAndAuthorized();
+
     }
 
     @Epic(value = "UI Stellar Burgers")
@@ -106,18 +124,21 @@ public class AuthorizationTest {
     @Owner(value = "Кидяев Александр Дмитриевич")
     @Severity(value = SeverityLevel.CRITICAL)
     public void authorizationByLinkFromPasswordRestorePageTest() {
-        Map<String, String> newUser = userOperations.register();
-        String email = newUser.get("email");
-        String password = newUser.get("password");
-        mainPage = open(URL, MainPage.class);
+
         mainPage.clickEnterAccountButton();
+
         authorizationPage = page(AuthorizationPage.class);
+
         authorizationPage.clickRestorePasswordLink();
+
         RestorePasswordPage restorePasswordPage = page(RestorePasswordPage.class);
+
         restorePasswordPage.clickEnterLink();
         authorizationPage.inputAuthorizationData(email, password);
         authorizationPage.clickEnterButton();
+
         mainPage.isOnMainPageAndAuthorized();
+
     }
 
 }

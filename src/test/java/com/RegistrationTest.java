@@ -18,10 +18,23 @@ public class RegistrationTest {
     private MainPage mainPage;
     private AuthorizationPage authorizationPage;
     private RegistrationPage registrationPage;
+    private String email;
+    private String name;
 
     @Before
     public void setUp () {
+
         userOperations = new UserOperations();
+
+        mainPage = open(URL, MainPage.class);
+        mainPage.clickEnterAccountButton();
+        authorizationPage = page(AuthorizationPage.class);
+        authorizationPage.clickRegisterLink();
+        registrationPage = page(RegistrationPage.class);
+
+        email = userOperations.getRandomEmail();
+        name = userOperations.getRandomName();
+
     }
 
     @After
@@ -37,20 +50,17 @@ public class RegistrationTest {
     @Owner(value = "Кидяев Александр Дмитриевич")
     @Severity(value = SeverityLevel.BLOCKER)
     public void correctRegistrationTest() {
-        mainPage = open(URL, MainPage.class);
-        mainPage.clickEnterAccountButton();
-        authorizationPage = page(AuthorizationPage.class);
-        authorizationPage.clickRegisterLink();
-        registrationPage = page(RegistrationPage.class);
-        String email = userOperations.getRandomEmail();
+
         String password = userOperations.getRandomPassword();
-        String name = userOperations.getRandomName();
+
         registrationPage.inputRegistrationData(email, password, name);
         registrationPage.clickRegisterButton();
         userOperations.setTokens(email, password);
         authorizationPage.inputAuthorizationData(email, password);
         authorizationPage.clickEnterButton();
+
         mainPage.isOnMainPageAndAuthorized(); //Проверяем, что авторизация была успешна, т.е. пользователь оказался на главной странице и кнопка "Оформить заказ" доступна
+
         userOperations.delete();
     }
 
@@ -62,20 +72,17 @@ public class RegistrationTest {
     @Owner(value = "Кидяев Александр Дмитриевич")
     @Severity(value = SeverityLevel.NORMAL)
     public void registrationWithIncorrectPasswordTest() {
-        mainPage = open(URL, MainPage.class);
-        mainPage.clickEnterAccountButton();
-        authorizationPage = page(AuthorizationPage.class);
-        authorizationPage.clickRegisterLink();
-        registrationPage = page(RegistrationPage.class);
+
         String password = userOperations.getRandomIncorrectPassword();
-        String email = userOperations.getRandomEmail();
-        String name = userOperations.getRandomName();
+
         registrationPage.inputRegistrationData(email, password, name);
         registrationPage.checkIncorrectPasswordControlVisibility(); //проверяем появился ли контроль на некорректность пароля
         registrationPage.clickRegisterButton(); //пробуем зарегистрироваться не смотря на контроль
+
         String actualURL = url();
         Assert.assertEquals(URL + "register", actualURL); //подтверждаем, что регистрация с некорректным паролем не прошла и пользователь все еще находится на странице регистрации
         registrationPage.isEnterLinkVisible(); //и доступна ссылка "Войти"
+
     }
 
 }

@@ -22,16 +22,32 @@ public class ProfileTest {
     private MainPage mainPage;
     private AuthorizationPage authorizationPage;
     private ProfilePage profilePage;
+    private String email;
+    private String password;
+    private String name;
 
     @Before
     public void setUp () {
+
         userOperations = new UserOperations();
+
+        Map<String, String> newUser = userOperations.register();
+
+        email = newUser.get("email");
+        password = newUser.get("password");
+        name = newUser.get("name");
+
+        mainPage = open(URL, MainPage.class);
+
     }
 
     @After
     public void tearDown () {
+
         userOperations.delete();
+
         getWebDriver().quit();
+
     }
 
     @Epic(value = "UI Stellar Burgers")
@@ -42,17 +58,17 @@ public class ProfileTest {
     @Owner(value = "Кидяев Александр Дмитриевич")
     @Severity(value = SeverityLevel.CRITICAL)
     public void checkProfileEnteringFromMainPageTest() {
-        Map<String, String> newUser = userOperations.register();
-        String email = newUser.get("email");
-        String password = newUser.get("password");
-        String name = newUser.get("name");
-        mainPage = open(URL, MainPage.class);
+
         mainPage.clickEnterAccountButton();
+
         authorizationPage = page(AuthorizationPage.class);
+
         authorizationPage.inputAuthorizationData(email, password);
         authorizationPage.clickEnterButton();
         mainPage.clickProfileLink();
+
         profilePage = page(ProfilePage.class);
+
         profilePage.checkProfileData(name, email); //Проверяем что переход в профиль осуществлен. А именно, то что имеются поля с именем и логином, в которых содержится корректная информация
 
     }
@@ -65,21 +81,24 @@ public class ProfileTest {
     @Owner(value = "Кидяев Александр Дмитриевич")
     @Severity(value = SeverityLevel.CRITICAL)
     public void checkClickConstructorButtonFromProfilePageTest() {
-        Map<String, String> newUser = userOperations.register();
-        String email = newUser.get("email");
-        String password = newUser.get("password");
-        mainPage = open(URL, MainPage.class);
+
         mainPage.clickEnterAccountButton();
+
         authorizationPage = page(AuthorizationPage.class);
+
         authorizationPage.inputAuthorizationData(email, password);
         authorizationPage.clickEnterButton();
         mainPage.clickProfileLink();
+
         profilePage = page(ProfilePage.class);
+
         profilePage.clickConstructorLink();
+
         mainPage.isOnMainPageAndAuthorized();
         //еще была мысль проверять адрес страницы способом ниже. Но подумал, что будет избыточно, поэтому под конец решил закомментировать тут (чтобы ход мысли показать) и убрать ее из большинства остальных тестов
         //String actualURL = url();
         //Assert.assertEquals(URL, actualURL);
+
     }
 
     @Epic(value = "UI Stellar Burgers")
@@ -90,18 +109,21 @@ public class ProfileTest {
     @Owner(value = "Кидяев Александр Дмитриевич")
     @Severity(value = SeverityLevel.CRITICAL)
     public void checkClickOnLogoFromProfilePageTest() {
-        Map<String, String> newUser = userOperations.register();
-        String email = newUser.get("email");
-        String password = newUser.get("password");
-        mainPage = open(URL, MainPage.class);
+
         mainPage.clickEnterAccountButton();
+
         authorizationPage = page(AuthorizationPage.class);
+
         authorizationPage.inputAuthorizationData(email, password);
         authorizationPage.clickEnterButton();
         mainPage.clickProfileLink();
+
         profilePage = page(ProfilePage.class);
+
         profilePage.clickLogo();
+
         mainPage.isOnMainPageAndAuthorized();
+
     }
 
     @Epic(value = "UI Stellar Burgers")
@@ -112,20 +134,23 @@ public class ProfileTest {
     @Owner(value = "Кидяев Александр Дмитриевич")
     @Severity(value = SeverityLevel.CRITICAL)
     public void checkLogoutTest() {
-        Map<String, String> newUser = userOperations.register();
-        String email = newUser.get("email");
-        String password = newUser.get("password");
-        mainPage = open(URL, MainPage.class);
+
         mainPage.clickEnterAccountButton();
+
         authorizationPage = page(AuthorizationPage.class);
+
         authorizationPage.inputAuthorizationData(email, password);
         authorizationPage.clickEnterButton();
         mainPage.clickProfileLink();
+
         profilePage = page(ProfilePage.class);
+
         profilePage.logout();
+
         authorizationPage.checkEnterTextVisibility();
         String actualURL = url();
         Assert.assertEquals(URL + "login", actualURL);
+
     }
 
 }
